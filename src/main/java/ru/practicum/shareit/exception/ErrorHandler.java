@@ -32,6 +32,14 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    // Обработчик ForbiddenOperationException
+    @ExceptionHandler(ForbiddenOperationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN) // Код ответа 403
+    public ErrorResponse handleForbiddenOperationException(final ForbiddenOperationException e) {
+        log.warn("Error", e);
+        return new ErrorResponse(e.getMessage());
+    }
+
     // Обработчик любых других исключений
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // Код ответа 500

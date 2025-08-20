@@ -13,5 +13,4 @@ public class ItemDto {
     private String name;
     private String description;
     private boolean available;
-    private Long owner;
 }

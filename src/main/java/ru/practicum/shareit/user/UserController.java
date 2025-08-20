@@ -4,9 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserCreateDto;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserPatchDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
@@ -20,23 +19,23 @@ public class UserController {
     private final UserService service;
 
     @PostMapping
-    public User add(@RequestBody @Valid UserCreateDto user) {
-        return service.addUser(UserMapper.toUser(user));
+    public UserDto add(@RequestBody @Valid UserCreateDto user) {
+        return service.addUser(user);
     }
 
     @PatchMapping("/{id}")
-    public User patch(@RequestBody @Valid UserPatchDto patchUser, @PathVariable Long id) {
+    public UserDto patch(@RequestBody @Valid UserPatchDto patchUser, @PathVariable Long id) {
         patchUser.setId(id);
-        return service.patchUser(UserMapper.toUser(patchUser));
+        return service.patchUser(patchUser);
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return service.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public UserDto getUserById(@PathVariable Long id) {
         return service.getUserById(id);
     }
 
