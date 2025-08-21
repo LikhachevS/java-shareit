@@ -1,12 +1,9 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.dto;
 
 import lombok.Data;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
-public class Item {
+public class ItemPatchDto {
     private Long id;
     private String name;
     private String description;
