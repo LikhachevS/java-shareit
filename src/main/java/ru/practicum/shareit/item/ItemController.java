@@ -18,23 +18,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService service;
+    private final String xSharerUserId = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto add(@RequestBody @Valid ItemCreateDto item, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDto add(@RequestBody @Valid ItemCreateDto item, @RequestHeader(xSharerUserId) long userId) {
         item.setOwner(userId);
         return service.addItem(item);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto patch(@RequestBody @Valid ItemPatchDto patchItem,
-                         @PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+                         @PathVariable Long itemId, @RequestHeader(xSharerUserId) long userId) {
         patchItem.setId(itemId);
         patchItem.setOwner(userId);
         return service.patchItem(patchItem);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader(xSharerUserId) long userId) {
         if (service.existsUserById(userId)) {
             return service.getItemById(itemId);
         } else {
@@ -43,7 +44,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemsFromUser(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDto> getItemsFromUser(@RequestHeader(xSharerUserId) long userId) {
         return service.getItemsFromUser(userId);
     }
 
