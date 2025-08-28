@@ -1,17 +1,37 @@
 package ru.practicum.shareit.item.mapper;
 
-import org.mapstruct.Mapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.model.User;
 
-@Mapper(componentModel = "spring")
-public interface ItemMapper {
+@Component
+@RequiredArgsConstructor
+public class ItemMapper {
+    private final UserRepository userRepository;
 
-    ItemDto toItemDto(Item item);
+    public ItemDto toItemDto(Item item) {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setId(item.getId());
+        itemDto.setName(item.getName());
+        itemDto.setDescription(item.getDescription());
+        itemDto.setAvailable(item.getAvailable());
 
-    Item toItem(ItemCreateDto itemCreateDto);
+        return itemDto;
+    }
 
-    Item toItem(ItemPatchDto itemPatchDto);
+    public Item toItem(ItemCreateDto itemCreateDto) {
+        User owner = userRepository.findById(itemCreateDto.getOwner()).get();
+
+        Item item = new Item();
+        item.setName(itemCreateDto.getName());
+        item.setDescription(itemCreateDto.getDescription());
+        item.setAvailable(itemCreateDto.getAvailable());
+        item.setOwner(owner);
+
+        return item;
+    }
 }

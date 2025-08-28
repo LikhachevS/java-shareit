@@ -21,49 +21,46 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto addUser(UserCreateDto user) {
-        if (existsByEmail(user.getEmail())) {
+        if (repository.existsByEmail(user.getEmail())) {
             throw new DuplicateException("Пользователь с email '" + user.getEmail() + "' уже зарегистрирован!");
         }
-        return UserMapper.toUserDto(repository.addUser(UserMapper.toUser(user)));
+        return UserMapper.toUserDto(repository.save(UserMapper.toUser(user)));
     }
 
     @Override
     public UserDto patchUser(UserPatchDto patchUser) {
-        if (existsById(patchUser.getId())) {
-            if (existsByEmail(patchUser.getEmail())) {
-                throw new DuplicateException("Пользователь с email '" + patchUser.getEmail() + "' уже зарегистрирован!");
-            }
-            return UserMapper.toUserDto(repository.patchUser(UserMapper.toUser(patchUser)));
-        } else {
-            throw new ValidationException("Пользователь с id " + patchUser.getId() + " не найден.");
+        User existingUser = repository.findById(patchUser.getId())
+                .orElseThrow(() -> new ValidationException("Пользователь с id " + patchUser.getId() + " не найден."));
+
+        if (patchUser.getEmail() != null && repository.existsByEmail(patchUser.getEmail())) {
+            throw new DuplicateException("Пользователь с email '" + patchUser.getEmail() + "' уже зарегистрирован!");
         }
+
+        if (patchUser.getName() != null) {
+            existingUser.setName(patchUser.getName());
+        }
+        if (patchUser.getEmail() != null) {
+            existingUser.setEmail(patchUser.getEmail());
+        }
+
+        return UserMapper.toUserDto(repository.save(existingUser));
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        List<User> users = repository.getAllUsers();
-        return users.stream()
+        return repository.findAll().stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUserById(Long id) {
-        return UserMapper.toUserDto(repository.getUserById(id)
+        return UserMapper.toUserDto(repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден.")));
     }
 
     @Override
     public void deleteUserById(Long id) {
-        repository.deleteUserById(id);
-    }
-
-    public boolean existsByEmail(String email) {
-        return repository.getAllUsers().stream()
-                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
-    }
-
-    public boolean existsById(Long id) {
-        return repository.getUserById(id).isPresent();
+        repository.deleteById(id);
     }
 }
