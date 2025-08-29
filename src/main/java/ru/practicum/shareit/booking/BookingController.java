@@ -17,7 +17,7 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService service;
-    static private final String xSharerUserId = "X-Sharer-User-Id";
+    private static final String xSharerUserId = "X-Sharer-User-Id";
 
     @PostMapping
     public BookingDto createBooking(@RequestBody @Valid BookingCreateDto bookingDto,
