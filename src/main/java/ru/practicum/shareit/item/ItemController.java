@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService service;
-    private final String xSharerUserId = "X-Sharer-User-Id";
+    static private final String xSharerUserId = "X-Sharer-User-Id";
 
     @PostMapping
     public ItemDto add(@RequestBody @Valid ItemCreateDto item, @RequestHeader(xSharerUserId) long userId) {

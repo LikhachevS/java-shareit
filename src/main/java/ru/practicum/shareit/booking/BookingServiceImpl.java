@@ -102,7 +102,6 @@ public class BookingServiceImpl implements BookingService {
                 break;
             default:
                 bookings = bookingRepository.findAllBookings(userId);
-                break;
         }
 
         return bookings.stream()
@@ -138,7 +137,6 @@ public class BookingServiceImpl implements BookingService {
                 break;
             default:
                 bookings = bookingRepository.findAllBookingsForOwner(userId);
-                break;
         }
 
         return bookings.stream()
