@@ -11,6 +11,8 @@ import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -25,15 +27,26 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
 
     @Override
-    public ItemDto addItem(ItemCreateDto item) {
-        if (!userRepository.existsById(item.getOwner())) {
-            throw new NotFoundException("Пользователь с id " + item.getOwner() + " не найден.");
+    public ItemDto addItem(ItemCreateDto itemCreateDto) {
+        if (!userRepository.existsById(itemCreateDto.getOwner())) {
+            throw new NotFoundException("Пользователь с id " + itemCreateDto.getOwner() + " не найден.");
         }
-        return itemMapper.toItemDto(itemRepository.save(itemMapper.toItem(item)));
+
+        Item newItem = itemMapper.toItem(itemCreateDto);
+
+        if (itemCreateDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemCreateDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Запрос с id " + itemCreateDto.getRequestId() + " не найден."));
+
+            newItem.setRequest(itemRequest);
+        }
+
+        return itemMapper.toItemDto(itemRepository.save(newItem));
     }
 
     @Override
