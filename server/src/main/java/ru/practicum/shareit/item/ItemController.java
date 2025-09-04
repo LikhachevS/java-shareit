@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.exception.ForbiddenOperationException;
 
 import java.util.List;
 
@@ -33,11 +32,7 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader(xSharerUserId) long userId) {
-        if (service.existsUserById(userId)) {
-            return service.getItemById(itemId, userId);
-        } else {
-            throw new ForbiddenOperationException("Недостаточно прав для выполнения операции");
-        }
+        return service.getItemById(itemId, userId);
     }
 
     @GetMapping

@@ -73,6 +73,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItemById(Long itemId, Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ForbiddenOperationException("Недостаточно прав для выполнения операции");
+        }
+
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь с id " + itemId + " не найдена."));
 
