@@ -1,0 +1,55 @@
+package ru.practicum.shareit.item;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.*;
+
+import java.util.List;
+
+/**
+ * TODO Sprint add-controllers.
+ */
+@RestController
+@RequestMapping("/items")
+@RequiredArgsConstructor
+public class ItemController {
+    private final ItemService service;
+    private static final String xSharerUserId = "X-Sharer-User-Id";
+
+    @PostMapping
+    public ItemDto add(@RequestBody ItemCreateDto item, @RequestHeader(xSharerUserId) long userId) {
+        item.setOwner(userId);
+        return service.addItem(item);
+    }
+
+    @PatchMapping("/{itemId}")
+    public ItemDto patch(@RequestBody ItemPatchDto patchItem,
+                         @PathVariable Long itemId, @RequestHeader(xSharerUserId) long userId) {
+        patchItem.setId(itemId);
+        patchItem.setOwner(userId);
+        return service.patchItem(patchItem);
+    }
+
+    @GetMapping("/{itemId}")
+    public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader(xSharerUserId) long userId) {
+        return service.getItemById(itemId, userId);
+    }
+
+    @GetMapping
+    public List<ItemDto> getItemsFromUser(@RequestHeader(xSharerUserId) long userId) {
+        return service.getItemsFromUser(userId);
+    }
+
+    @GetMapping("/search")
+    public List<ItemDto> searchItems(@RequestParam String text) {
+        return service.searchItems(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestBody CommentCreateDto comment,
+                                 @PathVariable long itemId, @RequestHeader(xSharerUserId) long userId) {
+        comment.setItemId(itemId);
+        comment.setAuthorId(userId);
+        return service.addComment(comment);
+    }
+}
