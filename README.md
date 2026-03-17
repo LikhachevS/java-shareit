@@ -49,3 +49,184 @@ ShareIt — это веб‑сервис для шеринга (совместн
 * **Тестирование**: JUnit 5, MockMVC, @JsonTest
 * **Взаимодействие с API**: REST
 * **Документация API**: Postman-коллекция (для ручного тестирования)
+
+### Структура проекта
+
+- Проект организован в виде микросервисной архитектуры с выделенным шлюзом 
+(shareit-gateway). 
+- Основная логика реализована в модуле shareit-server.
+- gateway (shareit-gateway) Модуль шлюза отвечает за валидацию запросов и взаимодействие с основным сервером через REST API.
+
+#### Схема структуры модуля gateway (shareit-gateway)
+
+```
+gateway (shareit-gateway)
+├── src
+    ├── main
+        ├── java
+            ├── ru.practicum.shareit
+                ├── booking                        # Работа с бронированиями
+                │   ├── dto                        # DTO-объекты для бронирований
+                │   ├── BookingClient              # Клиент для взаимодействия с сервисом бронирований на сервере
+                │   └── BookingController          # Контроллер для обработки запросов по бронированиям
+                ├── client                         # Базовые клиенты для взаимодействия с сервером
+                │   └── BaseClient                 # Базовый класс для всех клиентов
+                ├── item                           # Работа с вещами (items)
+                │   ├── dto                        # DTO-объекты для вещей
+                │   ├── ItemClient                 # Клиент для взаимодействия с сервисом вещей на сервере
+                │   └── ItemController             # Контроллер для обработки запросов по вещам
+                ├── request                        # Работа с запросами на вещи
+                │   ├── dto                        # DTO-объекты для запросов
+                │   ├── ItemRequestClient          # Клиент для взаимодействия с сервисом запросов на сервере
+                │   └── ItemRequestController      # Контроллер для обработки запросов на вещи
+                ├── user                           # Работа с пользователями
+                │   ├── dto                        # DTO-объекты для пользователей
+                │   ├── UserClient                 # Клиент для взаимодействия с сервисом пользователей на сервере
+                │   └── UserController             # Контроллер для обработки запросов по пользователям
+                └── ShareltGateway                 # Основной класс приложения шлюза
+        ├── resources                              # Ресурсы приложения (конфигурационные файлы, шаблоны)
+        └── test                                   # Тестовые классы и ресурсы 
+```
+#### Схема структуры модуля server(shareit-server)
+
+```
+shareit-server
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   ├── ru.practicum.shareit
+│   │   │   │   ├── user                           # Модуль работы с пользователями
+│   │   │   │   │   ├── dto                        # DTO-объекты (Data Transfer Object) для пользователей
+│   │   │   │   │   │   ├── CreateUserDto.java     # DTO для создания пользователя (POST-запросы)
+│   │   │   │   │   │   ├── UpdateUserDto.java     # DTO для обновления пользователя (PUT/PATCH-запросы)
+│   │   │   │   │   │   └── UserDto.java           # DTO для передачи данных пользователя (GET-запросы)
+│   │   │   │   │   ├── mapper                     # Мэпперы (преобразование объектов между слоями)
+│   │   │   │   │   │   ├── UserMapper.java        # Преобразование между DTO и моделью
+│   │   │   │   │   │   └── UserEntityMapper.java  # Преобразование между сущностью и моделью
+│   │   │   │   │   ├── model                      # Модели (сущности) пользователей
+│   │   │   │   │   │   ├── User.java              # Модель пользователя (бизнес-логика)
+│   │   │   │   │   │   └── UserEntity.java        # Сущность пользователя (для работы с БД)
+│   │   │   │   │   ├── UserController             # Контроллер (обрабатывает HTTP-запросы)
+│   │   │   │   │   │   └── UserController.java    # Класс контроллера с методами для CRUD-операций
+│   │   │   │   │   ├── UserRepository             # Репозиторий (работа с БД через JPA/Hibernate)
+│   │   │   │   │   │   └── UserRepository.java    # Интерфейс репозитория с методами поиска и сохранения
+│   │   │   │   │   ├── UserService                # Сервис (бизнес-логика, валидация)
+│   │   │   │   │   │   └── UserService.java       # Интерфейс сервиса с методами работы с пользователями
+│   │   │   │   │   ├── UserServiceImpl            # Реализация сервиса
+│   │   │   │   │   │   └── UserServiceImpl.java   # Класс, реализующий методы UserService
+│   │   │   │   │   └── ShareltServer              # Точка входа в приложение (основной класс)
+│   │   │   │   │       └── ShareltServer.java     # Основной класс, запускающий сервер
+│   │   │   │   └── ... (другие модули: booking, item, request)
+│   │   ├── resources                              # Ресурсы приложения (конфигурационные файлы, шаблоны)
+│   │   │   ├── application.properties             # Конфигурация приложения (JDBC, сервер, логирование)
+│   │   │   └── static                             # Статические файлы (CSS, JS, изображения)
+│   │   └── test                                   # Тестовые классы и ресурсы
+│   │       ├── java                               # Юнит- и интеграционные тесты
+│   │       │   └── ru.practicum.shareit.user      # Тесты для модуля user
+│   │       │       ├── UserControllerTest.java    # Тесты для контроллера
+│   │       │       ├── UserServiceTest.java       # Тесты для сервиса
+│   │       │       └── ...
+│   │       └── resources                          # Ресурсы для тестов (моки, фикстуры)
+│   └── 
+└── pom.xml                                        # Файл конфигурации Maven (зависимости, плагины, профили)
+```
+
+
+#### API Endpoints
+  
+##### Пользователи (UserController)
+
+POST /users — создать пользователя;
+
+GET /users/{userId} — получить пользователя по ID;
+
+PATCH /users/{userId} — обновить данные пользователя;
+
+DELETE /users/{userId} — удалить пользователя.
+
+##### Вещи (ItemController)
+POST /items — добавить новую вещь (X-Sharer-User-Id — ID владельца);
+
+PATCH /items/{itemId} — отредактировать вещь (только владелец);
+
+GET /items/{itemId} — информация о вещи (доступно всем);
+
+GET /items — список вещей владельца;
+
+GET /items/search?text={text} — поиск вещей по названию/описанию (только доступные для аренды).
+
+##### Бронирования (BookingController)
+POST /bookings — создать запрос на бронирование (статус WAITING);
+
+PATCH /bookings/{bookingId}?approved={true|false} — подтвердить/отклонить бронирование (только владелец вещи);
+
+GET /bookings/{bookingId} — информация о бронировании (владелец или арендатор);
+
+GET /bookings?state={state} — список бронирований пользователя (state: ALL, CURRENT, PAST, FUTURE, WAITING, REJECTED);
+
+GET /bookings/owner?state={state} — бронирования всех вещей пользователя (только владельцы).
+
+##### Запросы на вещи (ItemRequestController)
+POST /requests — создать запрос на вещь;
+
+GET /requests — список своих запросов с ответами;
+
+GET /requests/all — список чужих запросов (для ответов);
+
+GET /requests/{requestId} — информация по конкретному запросу.
+
+Отзывы (ItemController)
+POST /items/{itemId}/comment — оставить отзыв (только после аренды);
+
+GET /items/{itemId} и GET /items — просмотр отзывов к вещи.
+
+# Инструкция по запуску приложения локально
+
+### 1. Клонируйте репозиторий:
+git clone <ссылка_на_репозиторий>
+cd <имя_директории_проекта>
+
+### 2. Установите зависимости:
+* Docker + Docker Compose;
+* JDK 11+;
+* Maven.
+
+### 3. Запустите PostgreSQL через Docker Compose:
+docker-compose up -d
+
+Проверьте статус контейнеров:
+docker-compose ps
+(Убедитесь, что контейнер с PostgreSQL имеет статус Up)
+
+### 4. Соберите и запустите приложение:
+Через Maven:
+mvn clean install
+mvn spring-boot:run
+
+Или через JAR‑файл:
+java -jar target/<имя_проекта>.jar
+
+Приложение будет доступно по адресу: http://localhost:9090
+
+### 5. Для тестирования с H2 (профиль test):
+mvn spring-boot:run -Dspring.profiles.active=test
+
+### 6. Остановка приложения и контейнеров:
+1. Остановите Spring Boot‑приложение (Ctrl+C в терминале).
+2. Остановите и удалите контейнеры Docker:
+docker-compose down
+
+---
+
+### Важные настройки приложения:
+* Порт: 9090 (server.port=9090)
+* Подключение к PostgreSQL: jdbc:postgresql://localhost:5432/shareit
+* Пользователь БД: shareit
+* Пароль БД: shareit
+* Режим DDL: none — автоматическое создание таблиц через Hibernate отключено (spring.jpa.hibernate.ddl-auto=none).
+* Инициализация БД: always — Spring Boot выполняет SQL‑скрипты при каждом запуске (spring.sql.init.mode=always):
+
+schema.sql — создание структуры БД;
+* Профиль для тестирования: test (использует встроенную БД H2: jdbc:h2:mem:shareit).
+
+Готово! Приложение запущено и готово к использованию. 🔧
